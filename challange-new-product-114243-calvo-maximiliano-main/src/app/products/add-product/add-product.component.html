@@ -1,0 +1,133 @@
+<div class="container">
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="productNameInput">Nombre</label>
+      <input type="text" class="form-control" id="productNameInput" placeholder="Nombre del Producto"
+        formControlName="name" />
+      <div *ngIf="productForm.get('name')?.hasError('required') && productForm.get('name')?.touched"
+        class="text-danger">
+        Nombre es un campo requerido.
+      </div>
+      <div *ngIf="productForm.get('name')?.hasError('minlength') && productForm.get('name')?.touched"
+        class="text-danger">
+        Nombre debe tener al menos 5 caracteres.
+      </div>
+    </div>
+    <div *ngIf="productNameControl?.invalid && productNameControl?.touched && asyncValidationErrorMessage == ''"
+      class="text-danger">
+      Ingrese un nombre valido, mayor a 5 caracteres.
+    </div>
+    <div *ngIf="asyncValidationErrorMessage" class="text-danger">
+      {{ asyncValidationErrorMessage }}
+    </div>
+
+    <div class="form-group">
+      <label for="productDescriptionInput">Descripción</label>
+      <textarea class="form-control" id="productDescriptionInput" rows="3" formControlName="description"></textarea>
+      <div *ngIf="productForm.get('description')?.hasError('required') && productForm.get('description')?.touched"
+        class="text-danger">
+        Descripción es un campo requerido.
+      </div>
+      <div *ngIf="productForm.get('description')?.hasError('minlength') && productForm.get('description')?.touched"
+        class="text-danger">
+        Descripción debe tener al menos 10 caracteres.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="productPriceInput">Precio</label>
+      <input type="number" class="form-control" id="productPriceInput" formControlName="price" />
+      <div *ngIf="productForm.get('price')?.hasError('required') && productForm.get('price')?.touched"
+        class="text-danger">
+        Precio es un campo requerido.
+      </div>
+      <div *ngIf="productForm.get('price')?.hasError('min') && productForm.get('price')?.touched" class="text-danger">
+        Precio debe ser al menos 1.
+      </div>
+    </div>
+
+
+    <div class="form-group">
+      <label for="productTypeInput">Tipo de Producto</label>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" id="productTypeInputProducto" value="Producto"
+          formControlName="productType" />
+        <label class="form-check-label" for="productTypeInputProducto">Producto</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" id="productTypeInputServicio" value="Servicio"
+          formControlName="productType" />
+        <label class="form-check-label" for="productTypeInputServicio">Servicio</label>
+      </div>
+    </div>
+
+    <div formArrayName="inventories">
+      <div *ngFor="let inventory of inventoriesControls; let i = index" [formGroupName]="i">
+        <div class="form-group">
+          <label for="productLocationName">Nombre Lugar (Inventario)</label>
+          <input type="text" class="form-control" id="productLocationName" placeholder="Nombre"
+            formControlName="location" />
+          <div
+            *ngIf="productForm.get('inventories')?.get(i.toString())?.get('location')?.hasError('required') && productForm.get('inventories')?.get(i.toString())?.get('location')?.touched"
+            class="text-danger">
+            Nombre de Lugar es un campo requerido.
+          </div>
+          <div
+            *ngIf="productForm.get('inventories')?.get(i.toString())?.get('location')?.hasError('minlength') && productForm.get('inventories')?.get(i.toString())?.get('location')?.touched"
+            class="text-danger">
+            Nombre de Lugar debe tener al menos 5 caracteres.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="productLocationCount">Cantidad de Stock (Inventario)</label>
+          <input type="number" class="form-control" id="productLocationCount" formControlName="count" />
+          <div
+            *ngIf="productForm.get('inventories')?.get(i.toString())?.get('count')?.hasError('required') && productForm.get('inventories')?.get(i.toString())?.get('count')?.touched"
+            class="text-danger">
+            Stock es un campo requerido.
+          </div>
+          <div
+            *ngIf="productForm.get('inventories')?.get(i.toString())?.get('count')?.hasError('min') && productForm.get('inventories')?.get(i.toString())?.get('count')?.touched"
+            class="text-danger">
+            Stock debe ser al menos 1.
+          </div>
+          <div
+            *ngIf="productForm.get('inventories')?.get(i.toString())?.get('count')?.hasError('max') && productForm.get('inventories')?.get(i.toString())?.get('count')?.touched"
+            class="text-danger">
+            Stock no debe ser mayor de 100.
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <button type="button" (click)="removeInventory()" class="btn btn-danger">Eliminar
+          Inventario</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <button type="button" (click)="addInventory()" class="btn btn-primary">Agregar Inventario</button>
+    </div>
+
+    <div class="form-group" *ngIf="productForm.get('productType')?.value === 'Servicio'">
+      <label for="productTimeFractionInput">Fracción de Tiempo</label>
+      <input type="number" class="form-control" id="productTimeFractionInput" formControlName="timeFraction" />
+      <div *ngIf="productForm.get('timeFraction')?.hasError('min') && productForm.get('timeFraction')?.touched"
+        class="text-danger">
+        Fracción de Tiempo debe ser al menos 10.
+      </div>
+      <div *ngIf="productForm.get('timeFraction')?.hasError('max') && productForm.get('timeFraction')?.touched"
+        class="text-danger">
+        Fracción de Tiempo no debe ser mayor de 60.
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+    <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+    <div *ngIf="productForm.get('productType')?.value=== 'Producto' && !hasInventories" class="text-danger">
+      Por favor, agregue al menos un inventario.
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+  </form>
+</div>
+
